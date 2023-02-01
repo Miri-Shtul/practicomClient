@@ -1,0 +1,35 @@
+<form (ngSubmit)="save(myForm)" #myForm="ngForm">
+<label>שם המתכון</label>
+<input type="text" [(ngModel)]="newRecipe.Name" name="name"/><br>
+
+<label>משך זמן הכנה</label>
+<input type="text" [(ngModel)]="newRecipe.PreparationTimeInMinute" name="time"/><br>
+
+<label>רמת קושי</label>
+<input type="number" [(ngModel)]="newRecipe.Level" name="level"/><br>
+
+<label>קטגוריה</label>
+<select name="category">
+    <option>משקאות</option>
+    <option>בשר</option>
+    <option>עוגות</option>
+</select>
+
+<!-- <input type="button" value="הוסף שכבה"/>
+<div *ngFor="let item of newRecipe.Layers;let i=index">
+<input value="text" placeholder="תאור" [(ngModel)]="newRecipe.Layers[i].Description" name="des{{i}}"/>
+<label>רכיבים</label>
+<input *ngfor="let component of item.Layers.Components;let x=index" [(ngModel)]="item.Layers.Components[i]" name="com{{i}},{{x}}}}"/>
+</div> -->
+<input type="button" value="הוסף שכבה"/>
+<div *ngFor="let item of newRecipe.Layers; let i=index">
+  <input type="text" placeholder="תאור" [(ngModel)]="newRecipe.Layers[i].Description" name="des{{i}}"/>
+  <label>רכיבים</label>
+  <!-- <input *ngFor="let component of item.Layers.Components; let x=index" [(ngModel)]="item.Layers.Components[i]" name="com{{i}},{{x}}"/> -->
+  <input *ngFor="let component of item.Layers.Components; let x=index" [(ngModel)]="selectedComponent[i][x]" name="com{{i}},{{x}}"/>
+
+</div>
+
+<input type="button" value="שמור"/>
+
+</form>
