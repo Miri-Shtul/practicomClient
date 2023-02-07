@@ -1,4 +1,73 @@
-<input type="text" [(ngModel)]="user.Name"/>
-<input type="password" [(ngModel)]="user.Password"/>
-<input type="button" value="login" (click)="isLogin()"/>
-<p *ngIf="isCorrectPassword">worng password</p>
+<form #myForm="ngForm" id="form" class="row g-3" style="margin:10%;">
+    <div class="mb-3">
+        <input placeholder="תעודת זהות" [(ngModel)]="currentUser.Id" name="id" required pattern="[0-9]*"
+            #identityNUm="ngModel" class="form-control"  id="exampleInputEmail1"
+            aria-describedby="emailHelp"/>
+        <p *ngIf="identityNUm.touched&&identityNUm.errors&&identityNUm.errors['required']"> שדה חובה</p>
+        <p *ngIf="identityNUm.invalid && (identityNUm.dirty || identityNUm.touched)">תעודת זהות מוכרחה להכיל ספרות
+            בלבד
+        </p>
+    </div>
+    <div class="mb-3">
+        <input placeholder="שם פרטי" [(ngModel)]="currentUser.FirstName" name="fname" required pattern="[a-zA-Zא-ת ]*"
+            #firstN="ngModel" class="form-control" />
+        <p *ngIf="firstN.touched&&firstN.errors&&firstN.errors['required']">זהו שדה חובה</p>
+        <p *ngIf="firstN.invalid && (firstN.dirty || firstN.touched)">שם פרטי מוכרח להכיל אותיות בלבד</p><br>
+    </div>
+    <div class="mb-3">
+        <input placeholder="שם משפחה" [(ngModel)]="currentUser.LastName" name="lname" required pattern="[a-zA-Zא-ת ]*"
+            #lastN="ngModel" class="form-control" />
+        <p *ngIf="lastN.touched&&lastN.errors&&lastN.errors['required']">זהו שדה חובה</p>
+        <p *ngIf="lastN.invalid && (lastN.dirty || lastN.touched)">שם משפחה מוכרח להכיל אותיות בלבד</p>
+    </div>
+    <div class="mb-3">
+        <input type="date" [(ngModel)]="currentUser.BirthDay" name="date" required #dat="ngModel"
+            class="form-control" />
+        <p *ngIf="dat.invalid" &&(dat.dirty||dat.touched))>בחר תאריך</p>
+    </div>
+    <div class="mb-3">
+        <label>זהות מגדרית</label>
+        <select name="gg" [ngModel]="currentUser.Gender" required>
+            <option [value]="1">male</option>
+            <option [value]="2">femael</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>קופת חולים</label>
+        <select name="hhhhh" [(ngModel)]="currentUser.HMO">
+            <option [value]="1">macabi</option>
+            <option [value]="2">clalit</option>
+            <option [value]="3">mehuhedet</option>
+            <option [value]="4">leumi</option>
+        </select>
+    </div>
+    <button (click)="addCild()"> הוסף ילד</button>
+
+    <form *ngIf="isAddCild" #childFrom="ngForm" id="chiform" class="row g-3">
+        <div class="mb-3">
+            <input type="text" placeholder="תעודת זהות" [(ngModel)]="currentChild.Id" name="i" required
+                pattern="[0-9]*" #idChild="ngModel" class="form-control">
+            <p *ngIf="idChild.touched&&idChild.errors&&idChild.errors['required']"> שדה חובה</p>
+            <p *ngIf="idChild.invalid && (idChild.dirty || idChild.touched)">תעודת זהות מוכרחה להכיל ספרות בלבד
+            </p>
+        </div>
+        <div class="mb-3">
+            <input type="text" placeholder="שם הילד" [(ngModel)]="currentChild.Name" name="n" required pattern="[a-zA-Zא-ת ]*"
+                #nameC="ngModel" class="form-control">
+            <p *ngIf="nameC.touched&&nameC.errors&&nameC.errors['required']">זהו שדה חובה</p>
+            <p *ngIf="nameC.invalid && (nameC.dirty || nameC.touched)">שם פרטי מוכרח להכיל אותיות בלבד</p><br>
+        </div>
+        <div class="mb-3">
+            <input tyep="date" placeholder="תאריך לידה" [(ngModel)]="currentChild.BirthDay" name="b" required
+                #dateC="ngModel" class="form-control">
+            <p *ngIf="dateC.invalid" &&(dateC.dirty||dateC.touched))>בחר תאריך</p>
+        </div>
+        <input type="submit" (click)="addNewChild(childFrom)" [disabled]="!myForm.valid" value="הוסף ילד"
+            class="btn btn-primary">
+
+        
+    </form>
+
+    <input type="submit" (click)="save(myForm)" [disabled]="!myForm.valid" value="כניסה" class="btn btn-primary">
+</form>
+
