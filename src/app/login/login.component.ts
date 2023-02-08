@@ -6,6 +6,7 @@ import { ChildService } from '../services/child.service';
 import { PersonService } from '../services/person.service';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver'
+import { TitleStrategy } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -15,30 +16,51 @@ export class LoginComponent implements OnInit {
   currentUser = this.personServices.currentUser;
   isAddCild: boolean = false;
   children: Child[] = [];
+  isAlreadyExist: boolean = false;
   currentChild = new Child(this.personServices.currentUser.Id, "", "", new Date());
   constructor(public personServices: PersonService, public childService: ChildService) { }
   save(form) {
-
-    this.personServices.currentUser.HMO = Number(this.personServices.currentUser.HMO);
-    this.personServices.addNewUser(this.personServices.currentUser);
-    for (let i = 0; i < this.children.length; i++) {
-      this.childService.addNewChild(this.children[i]);
-
-
-    }
-
-    const workbook = new Workbook();
-    const worksheet = workbook.addWorksheet('My Sheet');
-    worksheet.addRow(['ID', 'FirstName', 'LastName', 'Birthday', 'Gender', 'HMO', 'Child Name', 'Child ID', 'Child Birthday'])
-    worksheet.addRow([this.personServices.currentUser.Id, this.personServices.currentUser.FirstName, this.personServices.currentUser.LastName, this.personServices.currentUser.BirthDay, this.personServices.currentUser.Gender, this.personServices.currentUser.HMO, '', '', '']);
-    this.children.forEach((child) => {
-      worksheet.addRow(['', '', '', '', '', '', child.Name, child.Id, child.BirthDay]);
-    });
-    workbook.xlsx.writeBuffer().then((data) => {
-      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, 'data.xlsx');
-    });
+    
+    this.personServices.getByID(this.personServices.currentUser.Id)
+      .subscribe(succ => {
+        if (succ == null)
+         { 
+          this.personServices.currentUser.HMO = Number(this.personServices.currentUser.HMO);
+          this.personServices.addNewUser(this.personServices.currentUser)
+            .subscribe(
+              person => {
+                console.log("Person added successfully", person);
+              },
+              error => {
+                this.isAlreadyExist = true;
+                if (error.status === 400 && error.error.success === false) {
+                  alert(error.error.message);
+                } else {
+                  console.error("Error adding person", error);
+                }
+              }
+            );
+          for (let i = 0; i < this.children.length; i++) {
+            this.childService.addNewChild(this.children[i]);
+          }
+          const workbook = new Workbook();
+          const worksheet = workbook.addWorksheet('My Sheet');
+          worksheet.addRow(['ID', 'FirstName', 'LastName', 'Birthday', 'Gender', 'HMO', 'Child Name', 'Child ID', 'Child Birthday'])
+          worksheet.addRow([this.personServices.currentUser.Id, this.personServices.currentUser.FirstName, this.personServices.currentUser.LastName, this.personServices.currentUser.BirthDay, this.personServices.currentUser.Gender, this.personServices.currentUser.HMO, '', '', '']);
+          this.children.forEach((child) => {
+            worksheet.addRow(['', '', '', '', '', '', child.Name, child.Id, child.BirthDay]);
+          });
+          workbook.xlsx.writeBuffer().then((data) => {
+            const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'data.xlsx');
+          });
+        }
+        else {
+          alert("קיים במערכת משתמש בעל תעודת זהות זו")
+        }
+      })
   }
+
   getHmoValues() {
     return Object.keys(EHmo).filter(k => typeof EHmo[k] === "string");
   }
